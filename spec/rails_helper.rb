@@ -1,6 +1,19 @@
 # frozen_string_literal: true
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
+# spec/rails_helper.rb
+
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_filter '/bin/'
+  add_filter '/db/'
+  add_filter '/spec/'
+  add_filter '/config/'
+  add_filter '/app/channels/application_cable/'
+  add_filter '/app/jobs/application_job.rb'
+  add_filter '/app/mailers/application_mailer.rb'
+end
+
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'

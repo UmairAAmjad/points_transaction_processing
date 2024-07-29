@@ -13,8 +13,10 @@ AllCops:
     - 'config/application.rb'
     - 'config/puma.rb'
     - 'config/spring.rb'
-
-Style/Documentation:
-  Enabled: false
 Rails:
   Enabled: true
+Style/Documentation:
+  Enabled: false
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*.rb'
