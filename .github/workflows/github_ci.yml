@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11.6-alpine
+        env:
+          POSTGRES_DB: points_transaction_processing_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.2
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+      - name: Set up the database
+        run: |
+          cp config/database.yml.ci config/database.yml
+          bin/rails db:drop RAILS_ENV=test || true
+          bin/rails db:create RAILS_ENV=test
+          bin/rails db:schema:load RAILS_ENV=test
+      - name: Run RuboCop
+        run: bundle exec rubocop
+      - name: Run tests
+        run: bundle exec rspec
