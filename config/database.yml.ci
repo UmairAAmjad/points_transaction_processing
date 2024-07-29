@@ -1,0 +1,8 @@
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: points_transaction_processing_test
+  pool: 5
+  username: postgres
+  password: postgres
+  host: localhost
