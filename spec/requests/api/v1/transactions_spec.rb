@@ -28,6 +28,20 @@ RSpec.describe Api::V1::TransactionsController, type: :request do
         expect(response.parsed_body['status']).to eq(I18n.t('transactions.error'))
       end
     end
+
+    context 'when an exception is raised' do
+      before do
+        allow(Transaction).to receive(:initialize_transaction).and_raise(StandardError, 'Something went wrong')
+      end
+
+      it 'returns an internal server error response' do
+        post '/api/v1/transactions/single', params: valid_attributes
+
+        expect(response).to have_http_status(:internal_server_error)
+        expect(response.parsed_body['status']).to eq(I18n.t('transactions.error'))
+        expect(response.parsed_body['errors']).to include('Something went wrong')
+      end
+    end
   end
 
   describe 'POST /api/v1/transactions/bulk' do
@@ -81,6 +95,22 @@ RSpec.describe Api::V1::TransactionsController, type: :request do
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.parsed_body['status']).to eq(I18n.t('transactions.error'))
+      end
+    end
+
+    context 'when an exception is raised' do
+      before do
+        allow_any_instance_of(TransactionProcessingService)
+          .to receive(:process_in_batches)
+          .and_raise(StandardError, 'Something went wrong')
+      end
+
+      it 'returns an internal server error response' do
+        post '/api/v1/transactions/bulk', params: valid_bulk_attributes
+
+        expect(response).to have_http_status(:internal_server_error)
+        expect(response.parsed_body['status']).to eq(I18n.t('transactions.error'))
+        expect(response.parsed_body['errors']).to include('Something went wrong')
       end
     end
   end
